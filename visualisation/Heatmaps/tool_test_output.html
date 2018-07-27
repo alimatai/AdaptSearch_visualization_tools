@@ -226,7 +226,7 @@ var renderTestResults = function(testData) {
 	var $sidebar = $("#nav-sidebar-tests");
 	for(var index in testData["tests"]) {
 		var test = testData["tests"][index];
-		var testResult = new TestResult(test);
+		var testResult = new TestResult(index, test);
 		var rawId = testResult.rawId;
 
 		var panelType = testResult.passed ? "panel-success panel-success-custom" : "panel-danger panel-danger-custom";
@@ -304,7 +304,7 @@ var renderTestResults = function(testData) {
 	}
 }
 
-var TestResult = function(data) {
+var TestResult = function(index, data) {
 	this.rawId = data["id"];
 
 	var idParts = this.rawId.split("TestForTool_");
@@ -316,10 +316,14 @@ var TestResult = function(data) {
 		splitParts = rSplit(testMethod, "_", 1);
 	}
 	var toolName = splitParts[0];
-	var testIndex = splitParts[1];
+	var testIndex;
+	if(data["data"]["test_index"] !== null) {
+		testIndex = data["data"]["test_index"];
+	} else {
+		testIndex = splitParts[1];
+	}
 	this.toolName = toolName;
-	this.testIndex = parseInt(testIndex);
-	console.log(data);
+	this.testIndex = parseInt(testIndex === undefined ? index : testIndex);
 	this.status = data["data"]["status"];
 	var job = data["data"]["job"];
 	if(job) {
@@ -375,7 +379,7 @@ function getUrlParameter(sParam)
         .success(function(content) { renderTestResults( $.parseJSON(content) ); })
         .failure(function() { alert("Failed to load test data.")} );
       } else {
-        var test_data = {"tests": [{"data": {"status": "failure", "inputs": {"input": {"src": "hda", "id": "2891970512fa2d5a"}, "tree": {"src": "hda", "id": "5729865256bc2525"}, "represent": "all"}, "problem_type": "exceptions.AssertionError", "problem_log": "Traceback (most recent call last):\n  File \"/opt/6.x/python-2.7.2/lib/python2.7/unittest/case.py\", line 327, in run\n    testMethod()\n  File \"/tmp/tmptLwhcx/galaxy-dev/test/functional/test_toolbox.py\", line 316, in test_tool\n    self.do_it(td)\n  File \"/tmp/tmptLwhcx/galaxy-dev/test/functional/test_toolbox.py\", line 75, in do_it\n    self.assertTrue(data_list or data_collection_list)\n  File \"/opt/6.x/python-2.7.2/lib/python2.7/unittest/case.py\", line 420, in assertTrue\n    raise self.failureException(msg)\nAssertionError: {} is not true\n"}, "id": "functional.test_toolbox.TestForTool_hmadaptsearch.test_tool_000000", "has_data": true}], "version": "0.1", "exit_code": 1, "summary": {"num_skips": 0, "num_errors": 0, "num_failures": 1, "num_tests": 1}};
+        var test_data = {"tests": [{"data": {"status": "success", "tool_id": "hmadaptsearch", "time_seconds": 41.783129930496216, "inputs": {"input": {"src": "hda", "id": "2891970512fa2d5a"}, "tree": {"src": "hda", "id": "5729865256bc2525"}, "represent": "all"}, "tool_version": "1.0", "job": {"inputs": {"input": {"src": "hda", "id": "2891970512fa2d5a", "uuid": "009dbd4c-891f-4540-8d33-c084add97c0b"}, "tree": {"src": "hda", "id": "5729865256bc2525", "uuid": "aa1489b0-38cd-4f9b-a936-6dd551692147"}}, "update_time": "2018-07-27T09:46:34.448440", "tool_id": "hmadaptsearch", "outputs": {"log": {"src": "hda", "id": "54f2a3a23292eb07", "uuid": "4402b6f0-d62a-4710-8a47-a7a3b8e0522b"}}, "stdout": "", "command_line": "python -W ignore '/home/umr7144/abice/vmataigne/Documents/AdaptSearch_visualization/visualisation/Heatmaps/scripts/heatmap_bokeh.py' '/tmp/tmpYVHFHj/files/000/dataset_1.dat' 'all' '/tmp/tmpYVHFHj/files/000/dataset_2.dat' > /tmp/tmpYVHFHj/files/000/dataset_3.dat;", "exit_code": 0, "state": "ok", "create_time": "2018-07-27T09:45:56.301488", "params": {"represent": "\"all\"", "chromInfo": "\"/tmp/tmpYVHFHj/galaxy-dev/tool-data/shared/ucsc/chrom/?.len\"", "dbkey": "\"?\""}, "stderr": "", "job_metrics": [], "model_class": "Job", "external_id": "122279", "id": "54f2a3a23292eb07", "user_email": "test@bx.psu.edu"}, "test_index": 0}, "id": "functional.test_toolbox.TestForTool_hmadaptsearch.test_tool_000000", "has_data": true}], "version": "0.1", "exit_code": 0, "summary": {"num_skips": 0, "num_errors": 0, "num_failures": 0, "num_tests": 1}};
         renderTestResults(test_data);
       }
     </script>

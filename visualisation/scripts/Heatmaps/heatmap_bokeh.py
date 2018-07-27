@@ -94,7 +94,8 @@ def makeHeatmap(df, what, on_what, colors, range_x, range_y, width, height):
     p.add_layout(color_bar, 'right')
 
     # output
-    export_png(p, filename='{}.png'.format(title.replace(" ", "_")))
+    export_png(p, filename='output_{}.png'.format(what))
+    # export_png(p, filename='{}.png'.format(title.replace(" ", "_"))) # before Galaxy's version
 
 def main():
     parser = argparse.ArgumentParser()
@@ -106,11 +107,12 @@ def main():
     print "\n*** Heatmaps on the results of MutCount in concatenated mode ***"
     print "\n    Species are ordered according to their position in the tree."
     print "    Codons are ordered according to their corresponding amino-acids,"
-    print "    and amino-acids are ordered accordint to their classification."
+    print "    and amino-acids are ordered accordint to their classification.\n"
 
+    print "Reading and formatting data ...\n"
     df = pd.read_csv(args.file, sep=",", index_col=0)
 
-    # Prepare data    
+    # Prepare data (Python trick : do a switch-case using a dictionary : avoid many if/elif statements)   
     on_what = {
         4: "amino-acids-types",
         20: "amino-acids",
@@ -152,7 +154,7 @@ def main():
     colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
 
     # choose order of lines and columns :
-    # x_range et y_range dans figure
+    # x_range et y_range in figure
     x_range = {'codons' : ['ttt','ttc','tgg','tat','tac','gat','gac','gaa','gag','cat',
                             'cac','aaa','aag','cgt','cgc','cga','cgg','aga','agg','tgt',
                             'tgc','aat','aac','cct','cca','ccg','ccc','caa','cag','tct',
@@ -167,13 +169,18 @@ def main():
     height = len(y_range)*50
 
     if args.represent == "counts":
+        print "Building heatmaps of {} counts ...".format(on_what)
         makeHeatmap(df, args.represent, on_what, colors, x_range[on_what], y_range, width, height)
     elif args.represent == "frequencies":
+        print "Building heatmaps of {} frequencies ...".format(on_what)
         makeHeatmap(df, args.represent, on_what, colors, x_range[on_what], y_range, width, height)
-    elif args.represent == "all":        
+    elif args.represent == "all":
+        print "Building heatmaps of {} counts ..."  .format(on_what)     
         makeHeatmap(df, "counts", on_what, colors, x_range[on_what], y_range, width, height)
+        print "Building heatmaps of {} frequencies ...".format(on_what)
         makeHeatmap(df, "frequencies", on_what, colors, x_range[on_what], y_range, width, height)
 
+    print "\nDone\n"
     # TODO :   
     #   - cluster a posteriori sur similitude
     #   - hover : valeur comptages/frequence + pvalue -> implique une colonne pvalue en plus de la colonne size

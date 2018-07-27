@@ -1,5 +1,12 @@
 <tool name="HeatMapsAdaptSearch" id="hmadaptsearch" version="1.0">
 
+    <!--
+    Wrapper does not work with png outputs
+        - Planemo serve : nothing happens
+        - Planemo test : fails. At s2d try, the tool_script.sh file is there (no_cleanup option) and when it is run a 2d time, the png outputs are produced
+        - When testing only log file : test OK and outputs are computed
+    -->
+
     <description>
         Builds heatmaps based on MutCount (concatenated mode) results
     </description>
@@ -10,25 +17,28 @@
 
     <requirements>
         <expand macro="python_required" />
-        <requirement type="package" version="0.20.0">pandas</requirement>
-        <requirement type="package" version="1.12.0">numpy</requirement>
-        <requirement type="package" version="0.12.6">bokeh</requirement>
+        <requirement type="package" version="0.22.0">pandas</requirement>
+        <requirement type="package" version="1.14.2">numpy</requirement>
+        <requirement type="package" version="0.12.15">bokeh</requirement>
+        <requirement type="package" version="3.12.0">selenium</requirement>
+        <requirement type="package" version="5.0.0">pillow</requirement>
+        <requirement type="package" version="2.1.1">phantomjs</requirement>
     </requirements>
 
-    <!--
     <stdio>
         <exit_code range="1:" level="fatal" />
     </stdio>
-    -->
 
     <command><![CDATA[
 
-        python '$__tool_directory__/scripts/heatmap_bokeh_vGalaxy.py' '$input' '$represent' '$tree'
+        python -W ignore '$__tool_directory__/scripts/heatmap_bokeh.py' '$input' '$represent' '$tree';
 
-    ]]></command>
+    ]]>        
+    </command>
+
     <inputs>
-        <param name="input" type="data" format="csv" label="Table" help="tabular files with counts or frequencies of codons, amino-acids, or amino-acids types (outputs of MutCount in 'concatenated' mode)" />
-        <param name="tree" type="data" format="nhx" label="Newick tree computed by ConcatPhyl (RAxML best tree)" help="The tree is used to order the species in the heatmap" />
+        <param name="input" type="data" format="csv" label="Table" help="csv file with counts and frequencies of codons, amino-acids, or amino-acids types (outputs of MutCount in 'concatenated' mode)" />
+        <param name="tree" type="data" format="nhx,txt" label="Newick tree computed by ConcatPhyl (RAxML best tree)" help="The tree is used to order the species in the heatmap" />
         <param name="represent" type="select" label="What to plot" >
             <option value="frequencies">Frequencies</option>
             <option value="counts">Counts</option>
@@ -38,47 +48,42 @@
 
     <outputs>
         <data format="png" name="heatmap_freqs" from_work_dir="output_frequencies.png" label="Frequencies_heatmap_on_${input.name}">
-            <filter>(represent=='frequencies' and represent=='all')</filter>
+            <filter>(represent == "frequencies" or represent == "all")</filter> 
         </data>
         <data format="png" name="heatmap_counts" from_work_dir="output_counts.png" label="Counts_heatmap_on_${input.name}">
-            <filter>(represent=='counts' and represent=='all')</filter>
+            <filter>(represent == "counts" or represent == "all")</filter> 
         </data>
     </outputs>
 
     <tests>
         <test>
             <param name="input" value="aa_freqs.csv"/>
-            <param name="tree" value="tree.nwk"/>
+            <param name="tree" value="tree.txt"/>
             <param name="represent" value="all"/>
-            <output name="heatmap_freqs" value="output_frequencies.png"/>
-            <output name="heatmap_counts" value="output_counts.png"/>
+            <!--
+            <output name="heatmap_freqs" value="outputs/frequencies_of_amino-acids.png"/>
+            <output name="heatmap_counts" value="outputs/countings_of_amino-acids.png"/>
+            -->
         </test>
     </tests>
 
     <help>
-    <![CDATA[
 
-. class:: infomark
-
-**Authors**  
-
-.. class:: infomark Victor Mataigne
-
-**Galaxy integration** 
-
-Contact support.abims@sb-roscoff.fr for any questions or concerns about the Galaxy implementation of this tool.
-
---------
+ @HELP_AUTHORS@
+    
+<![CDATA[
 
 **Description**
 
-This tool display the results of codons/amino-acids/amino-acids types counts and frequencies computed by The tool MutCount (in concatenated mode)
+This tool display, on heatmap(s), the results of codons/amino-acids/amino-acids types counts and frequencies computed by The tool MutCount (in concatenated mode)
 
 --------
 
 **Parameters**
 
-- Data File : 
+    - Table : one a csv file computed byt the tool 'MutCount' in 'Concatenated mode' : codons_freqs.csv, aa_freqs.csv, or amino_acids_types.csv
+    - Newick tree : a phylogentic tree in Newick format, computed by the tool 'ConcatPhyl' (which calls RAxML). If you import the tree with 'Get Data', you may have to specify the datatype 'nhx' or convert it afterwards.
+    - What to plot : you can choose to plot only counts or frequencies (one output file), or both (two output files)
 
 
 --------
@@ -93,13 +98,23 @@ One or two heatmaps (counts / frequencies) with species in lines (ordered as the
 Changelog
 ---------
 
+**Version 1 - 07/2018**
 
+  - First implementation under Galaxy
+  - Conda dependencies for Bokeh, pandas, and all required packages
 
     ]]>
 
     </help>
 
-    <expand macro="citations" />
+    <citations>
+        <citation type="bibtex">@Manual{,
+        title = {Bokeh: Python library for interactive visualization},
+        author = {{Bokeh Development Team}},
+        year = {2014},
+        url = {http://www.bokeh.pydata.org},
+        }
+        </citation>
+    </citations>
 
 </tool>
-

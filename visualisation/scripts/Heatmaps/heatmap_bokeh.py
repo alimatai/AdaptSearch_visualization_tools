@@ -107,7 +107,7 @@ def main():
     print "\n*** Heatmaps on the results of MutCount in concatenated mode ***"
     print "\n    Species are ordered according to their position in the tree."
     print "    Codons are ordered according to their corresponding amino-acids,"
-    print "    and amino-acids are ordered accordint to their classification.\n"
+    print "    and amino-acids are ordered according to their classification.\n"
 
     print "Reading and formatting data ...\n"
     df = pd.read_csv(args.file, sep=",", index_col=0)

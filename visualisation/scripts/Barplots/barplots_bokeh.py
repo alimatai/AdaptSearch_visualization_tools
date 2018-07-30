@@ -14,7 +14,7 @@ from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
 
 import pandas as pd
-import argparse, copy
+import argparse, copy, os
 from math import pi
 import logging
 logging.basicConfig()
@@ -85,6 +85,12 @@ def main():
     parser.add_argument("represent", choices=("counts", "frequencies", "both"), help="choose what to plot")
     args = parser.parse_args()
 
+    print "\n*** Barplots on the results of MutCount in concatenated mode ***"    
+    print "    Codons are ordered according to their corresponding amino-acids,"
+    print "    and amino-acids are ordered according to their classification.\n"
+
+    print "Reading and formatting data ...\n"
+
     df = pd.read_csv(args.file, sep=",", index_col=0)   
 
     # 1 - species (do not sort !)    
@@ -116,12 +122,26 @@ def main():
                             'tta','ttg','ctt','ctc','cta','ctg','atg','gtt','gtc','gta','gtg'],
                 'amino-acids' : ['F','W','Y','D','E','H','K','R','C','N','P','Q','S','T','A','G','I','L','M','V'],
                 'amino-acids-types' : ['aromatics','charged','polar','unpolar']}
-    
+
     for species in list_sp:
         if args.represent in ['counts', 'both']:
+            print 'Building barplots of {} {} counts ...'.format(species, end_title)
             make_barplot(species, xaxis, dic_yaxis_counts, dic_yaxis_pvalues, 'Counts', x_range, width, end_title)
-        if args.represent in ['frequencies', 'both'] :
+        if args.represent in ['frequencies', 'both']:
+            print 'Building barplots of {} {} frequencies ...'.format(species, end_title)
             make_barplot(species, xaxis, dic_yaxis_freqs, dic_yaxis_pvalues, 'Frequencies', x_range, width, end_title)
+    
+    # Setting up output directory(ies)
+    print '\nSetting up output directory(ies) ...'
+    if args.represent in ['counts', 'both']:
+        os.mkdir('barplots_counts')
+        os.system('mv Counts*.png barplots_counts')
+
+    if args.represent in ['frequencies', 'both']:
+        os.mkdir('barplots_frequencies')
+        os.system('mv Frequencies*.png barplots_frequencies')
+
+    print "\nDone\n"
 
 if __name__ == "__main__":
     main()

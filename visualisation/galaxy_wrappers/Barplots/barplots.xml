@@ -24,14 +24,13 @@
 
     <command><![CDATA[
 
-        python -W ignore '$__tool_directory__/scripts/barplots_bokeh.py' '$input' '$represent' ;
+        python -W ignore '$__tool_directory__/scripts/barplots_bokeh.py' '$input' '$represent' > $log;
 
     ]]>        
     </command>
 
     <inputs>
         <param name="input" type="data" format="csv" label="Table" help="csv file with counts and frequencies of codons, amino-acids, or amino-acids types (outputs of MutCount in 'concatenated' mode)" />
-        <param name="tree" type="data" format="nhx,txt" label="Newick tree computed by ConcatPhyl (RAxML best tree)" help="The tree is used to order the species in the heatmap" />
         <param name="represent" type="select" label="What to plot" >
             <option value="frequencies">Frequencies</option>
             <option value="counts">Counts</option>
@@ -40,18 +39,23 @@
     </inputs>
 
     <outputs>
-        <collection name="barplots_counts" type="list" label="Barplots_of_counts_on_${input.name}">
+        <data format="txt" name="log" label="barplots_log" />
+        <collection name="bar_counts" type="list" label="Barplots_of_counts_on_${input.name}">
+            <discover_datasets pattern="__name_and_ext__" directory="barplots_counts" />
             <filter>(represent == "counts" or represent == "both")</filter>
         </collection>
-        <collection name="barplots_frequencies" type="list" label="Barplots_of_frequencies_on_${input.name}">
+        <collection name="bar_frequencies" type="list" label="Barplots_of_frequencies_on_${input.name}">
+            <discover_datasets pattern="__name_and_ext__" directory="barplots_frequencies" />
             <filter>(represent == "frequencies" or represent == "both")</filter>
         </collection>
     </outputs>
 
     <tests>
         <test>
+            <!-- Note : cannot test with png outputs ... I made a test with the additional log.txt file, which is kept just in case of a bug : more explicit error -->
             <param name="input" value="aa_freqs.csv"/>
-            <param name="represent" value="both"/>
+            <param name="represent" value="both"/> 
+            <output name="log" value="log.txt"/>
             <!--
             <output name="heatmap_freqs" value="outputs/frequencies_of_amino-acids.png"/>
             <output name="heatmap_counts" value="outputs/countings_of_amino-acids.png"/>

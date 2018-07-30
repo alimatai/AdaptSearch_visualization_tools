@@ -1,7 +1,7 @@
-<tool name="HeatMapsAdaptSearch" id="hmadaptsearch" version="1.0">
+<tool name="BarPlotsAdaptSearch" id="bpadaptsearch" version="1.0">
 
     <description>
-        Builds heatmaps based on MutCount (concatenated mode) results
+        Builds barplots based on MutCount (concatenated mode) results
     </description>
 
     <macros>
@@ -24,7 +24,7 @@
 
     <command><![CDATA[
 
-        python -W ignore '$__tool_directory__/scripts/heatmap_bokeh.py' '$input' '$represent' '$tree';
+        python -W ignore '$__tool_directory__/scripts/barplots_bokeh.py' '$input' '$represent' ;
 
     ]]>        
     </command>
@@ -35,24 +35,23 @@
         <param name="represent" type="select" label="What to plot" >
             <option value="frequencies">Frequencies</option>
             <option value="counts">Counts</option>
-            <option value="all">Both</option>
+            <option value="both">Both</option>
         </param>
     </inputs>
 
     <outputs>
-        <data format="png" name="heatmap_freqs" from_work_dir="output_frequencies.png" label="Frequencies_heatmap_on_${input.name}">
-            <filter>(represent == "frequencies" or represent == "all")</filter> 
-        </data>
-        <data format="png" name="heatmap_counts" from_work_dir="output_counts.png" label="Counts_heatmap_on_${input.name}">
-            <filter>(represent == "counts" or represent == "all")</filter> 
-        </data>
+        <collection name="barplots_counts" type="list" label="Barplots_of_counts_on_${input.name}">
+            <filter>(represent == "counts" or represent == "both")</filter>
+        </collection>
+        <collection name="barplots_frequencies" type="list" label="Barplots_of_frequencies_on_${input.name}">
+            <filter>(represent == "frequencies" or represent == "both")</filter>
+        </collection>
     </outputs>
 
     <tests>
         <test>
             <param name="input" value="aa_freqs.csv"/>
-            <param name="tree" value="tree.txt"/>
-            <param name="represent" value="all"/>
+            <param name="represent" value="both"/>
             <!--
             <output name="heatmap_freqs" value="outputs/frequencies_of_amino-acids.png"/>
             <output name="heatmap_counts" value="outputs/countings_of_amino-acids.png"/>
@@ -68,21 +67,20 @@
 
 **Description**
 
-This tool display, on heatmap(s), the results of codons/amino-acids/amino-acids types counts and frequencies computed by The tool MutCount (in concatenated mode)
+This tool display, on barplots, the results of codons/amino-acids/amino-acids types counts and frequencies computed by The tool MutCount (in concatenated mode)
 
 --------
 
 **Parameters**
 
-    - Table : one a csv file computed byt the tool 'MutCount' in 'Concatenated mode' : codons_freqs.csv, aa_freqs.csv, or amino_acids_types.csv
-    - Newick tree : a phylogentic tree in Newick format, computed by the tool 'ConcatPhyl' (which calls RAxML). If you import the tree with 'Get Data', you may have to specify the datatype 'nhx' or convert it afterwards.
+    - Table : one a csv file computed byt the tool 'MutCount' in 'Concatenated mode' : codons_freqs.csv, aa_freqs.csv, or amino_acids_types.csv    
     - What to plot : you can choose to plot only counts or frequencies (one output file), or both (two output files)
 
 --------
 
 **Outputs**
 
-One or two heatmaps (counts / frequencies) with species in lines (ordered as they appear in the phylogenetic tree) and codons/amino-acids/types of amino-acids in columns. Columns are ordered along the types of amino-acids.
+one or two collection of histograms (one per species), plotting counts or/and counts and frequencies.
 
 --------
 

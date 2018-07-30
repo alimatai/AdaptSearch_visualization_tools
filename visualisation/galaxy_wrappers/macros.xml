@@ -1,0 +1,23 @@
+<macros>
+
+	<xml name="python_required">
+			<requirement type="package" version="2.7">python</requirement>
+	</xml>
+
+    <token name="@HELP_AUTHORS@">
+.. class:: infomark
+
+**Authors**  Victor Mataigne
+
+.. class:: infomark
+
+**Galaxy integration** ABiMS TEAM
+
+ | Contact support.abims@sb-roscoff.fr for any questions or concerns about the Galaxy implementation of this tool.
+ | Credits : Gildas le Corguillé
+ 
+---------------------------------------------------
+
+    </token>
+
+</macros>

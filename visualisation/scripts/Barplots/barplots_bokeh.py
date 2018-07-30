@@ -7,13 +7,14 @@ from bokeh.io import export_png
 from bokeh.models import ColumnDataSource, FactorRange
 from bokeh.models import LinearAxis, Range1d
 from bokeh.models import Legend
+from bokeh.models.mappers import CategoricalColorMapper
 
-from bokeh.palettes import Spectral6
+from bokeh.palettes import brewer
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
 
 import pandas as pd
-import argparse
+import argparse, copy
 from math import pi
 import logging
 logging.basicConfig()
@@ -35,30 +36,53 @@ def makeValues(df, start, list_sp):
         dic[list_sp[i/3]] = list(df.iloc[i])
     return dic
 
+def make_barplot(species, xaxis, dic_yaxis, dic_yaxis_pvalues, what, x_range, width, end_title):
+    colors = ["#75968f", "#dfccce", "#550b1d"]
+    #colors=brewer['RdYlBu'][3]
+    title = '{} on {} {}'.format(what, species, end_title)
 
-def makeLegend(what, r):
-    """ Build the legend of the barplot
+    pvalues_factor = copy.deepcopy(dic_yaxis_pvalues[species])
 
-    Args:
-        - what (tuple of str): ex ('counts', 'Frequencies', 'pvalues')
-        - r (tuple of [bokeh objects])
+    # Transform pvalues in categorical data for color range
+    for i in range(0,len(dic_yaxis_pvalues[species])):
+        if dic_yaxis_pvalues[species][i] < 0.05:
+            pvalues_factor[i] = 'lower'
+        elif dic_yaxis_pvalues[species][i] > 0.95:
+            pvalues_factor[i] = 'higher'
+        else :
+            pvalues_factor[i] = 'unsignificant'
 
-    Return:
-        - legend (bokeh 'Legend' object)
-    """
-    items = []
-    for i in range(len(what)):
-        items.append((what[i], r[i]))
-    legend = Legend(items=items, location=(0,0), orientation='horizontal')
-    return legend
+    # Color range mapper
+    mapper = CategoricalColorMapper(palette=colors, factors=['lower', 'unsignificant', 'higher'])
+
+    p = figure(x_range=x_range[end_title], 
+        plot_width=width, 
+        plot_height=350, 
+        toolbar_location=None, 
+        title=title)
+
+    if end_title == 'codons':
+        p.xaxis.major_label_orientation = pi / 3
+
+    source = ColumnDataSource(data=dict(what=xaxis, counts=dic_yaxis[species], label=pvalues_factor))
+
+    r1 = p.vbar(x='what', 
+        top='counts', 
+        width=0.9, 
+        source=source, 
+        line_color='white', 
+        color={'field': 'label', 'transform':mapper},
+        legend='label')    
+    
+    p.legend.orientation = 'horizontal'
+    p.legend.location = 'top_right'
+
+    export_png(p, filename='{}.png'.format(title.replace(" ","_")))
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="Input csv file")
     parser.add_argument("represent", choices=("counts", "frequencies", "both"), help="choose what to plot")
-    # Compatible only with represent = both
-    parser.add_argument("-s", "--separated", action="store_true", help="choose to plot frequencies and counts on the same graph or not")
-
     args = parser.parse_args()
 
     df = pd.read_csv(args.file, sep=",", index_col=0)   
@@ -93,71 +117,11 @@ def main():
                 'amino-acids' : ['F','W','Y','D','E','H','K','R','C','N','P','Q','S','T','A','G','I','L','M','V'],
                 'amino-acids-types' : ['aromatics','charged','polar','unpolar']}
     
-    # 4 - plots. One plot per species
-
-    # separated barplots for counts and freqs
-    if args.separated :
-        for species in list_sp:
-            if args.represent in ['counts', 'both']:
-                title = 'counts on {} {}'.format(species, end_title)
-
-                p = figure(x_range=x_range[end_title], plot_width=width, plot_height=350, toolbar_location=None, title=title)
-                if end_title == 'codons':
-                    p.xaxis.major_label_orientation = pi / 3
-
-                source = ColumnDataSource(data=dict(what=xaxis, counts=dic_yaxis_counts[species]))
-                r1 = p.vbar(x='what', top='counts', width=0.9, source=source, line_color='white', fill_color=Spectral6[0]) # barplot
-               
-                # second y-axis and dot plot for pvalues
-                p.extra_y_ranges = {'pvalues': Range1d(start=0, end=1)}
-                p.add_layout(LinearAxis(y_range_name='pvalues'), 'right')
-                r2 = p.circle(xaxis, dic_yaxis_pvalues[species], y_range_name='pvalues', color='black', line_width=2)
-                
-                legend = makeLegend(('counts', 'pvalues'), ([r1], [r2]))
-                p.add_layout(legend, 'below')
-
-                export_png(p, filename='{}.png'.format(title.replace(" ","_")))
-
-            if args.represent in ['frequencies', 'both']:
-                title = 'Frequencies on {} {}'.format(species, end_title)
-
-                p = figure(x_range=x_range[end_title], y_range=(0,1), plot_width=width, plot_height=350, toolbar_location=None, title=title)
-                if end_title == 'codons':
-                    p.xaxis.major_label_orientation = pi / 3
-
-                source = ColumnDataSource(data=dict(what=xaxis, freqs=dic_yaxis_freqs[species]))
-                # plot frequencies and pvalues (barplot, dotplot)
-                r1 = p.vbar(x='what', top='freqs', width=0.9, source=source, line_color='white', fill_color=Spectral6[5])
-                r2 = p.circle(xaxis, dic_yaxis_pvalues[species], y_range_name='pvalues', color='black', line_width=2)
-                p.y_range.start = 0
-               
-                legend = makeLegend(('Frequencies', 'pvalues'), ([r1], [r2]))
-                p.add_layout(legend, 'below')
-
-                export_png(p, filename='{}.png'.format(title.replace(" ","_")))
-
-    # counts and frequencies on the same graph
-    if not args.separated:
-        for species in list_sp:
-            title = 'Counts and Frequencies on {} {}'.format(species, end_title)
-
-            p = figure(x_range=x_range[end_title], plot_width=width, plot_height=350, toolbar_location=None, title=title)
-            if end_title == 'codons':
-                p.xaxis.major_label_orientation = pi / 3
-
-            p.extra_y_ranges = {'pvalues': Range1d(start=0, end=1)}
-            p.add_layout(LinearAxis(y_range_name='pvalues'), 'right')
-
-            source = ColumnDataSource(data=dict(what=xaxis, counts=dic_yaxis_counts[species]))
-            r1 = p.vbar(x='what', top='counts', width=0.9, source=source, line_color='white', fill_color=Spectral6[0])
-            source = ColumnDataSource(data=dict(what=xaxis, freqs=dic_yaxis_freqs[species]))
-            r2 = p.vbar(x='what', top='freqs', width=0.9, source=source, y_range_name='pvalues', line_color='white', fill_color=Spectral6[5])
-            r3 = p.circle(xaxis, dic_yaxis_pvalues[species], y_range_name='pvalues', color='black', line_width=2)
-
-            legend = makeLegend(('counts', 'Frequencies', 'pvalues'), ([r1], [r2], [r3]))
-            p.add_layout(legend, 'below')
-
-            export_png(p, filename='{}.png'.format(title.replace(" ","_")))
+    for species in list_sp:
+        if args.represent in ['counts', 'both']:
+            make_barplot(species, xaxis, dic_yaxis_counts, dic_yaxis_pvalues, 'Counts', x_range, width, end_title)
+        if args.represent in ['frequencies', 'both'] :
+            make_barplot(species, xaxis, dic_yaxis_freqs, dic_yaxis_pvalues, 'Frequencies', x_range, width, end_title)
 
 if __name__ == "__main__":
     main()

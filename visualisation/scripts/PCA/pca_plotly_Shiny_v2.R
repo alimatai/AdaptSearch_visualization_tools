@@ -67,13 +67,14 @@ server <- function (input, output) {
         data <-read.table(input$input_file$datapath, header=TRUE, dec=".", sep=",", row.names=1)
         
         if (input$input_file$name != "gc_and_others.csv") {
-            if (input$what == "counts") {selected_data <- data[seq(1, nrow(data), 2),]} 
-            else if (input$what == "freqs") {selected_data <- data[seq(2, nrow(data), 2),]}
-            
             if (grepl('transitions', input$input_file$name)) {
-                row.names(selected_data) <- substrLeft(row.names(selected_data),3) # faire plutôt un strsplit ?
+                if (input$what == "counts") {selected_data <- data[seq(1, nrow(data), 4),]} 
+                else if (input$what == "freqs") {selected_data <- data[seq(2, nrow(data), 4),]}
+                row.names(selected_data) <- substrLeft(row.names(selected_data),5) # faire plutôt un strsplit ?
             } else {
-                row.names(selected_data) <- substrLeft(row.names(selected_data),1)
+                if (input$what == "counts") {selected_data <- data[seq(1, nrow(data), 3),]} 
+                else if (input$what == "freqs") {selected_data <- data[seq(2, nrow(data), 3),]}
+                row.names(selected_data) <- substrLeft(row.names(selected_data),2)
             }
             
         } else {

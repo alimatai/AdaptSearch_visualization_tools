@@ -65,12 +65,12 @@ server <- function (input, output) {
         if(input$start != 0) {
  
             if (input$what == "counts") {
-                data_plots <- data()[seq(1, nrow(data()), 3),]
+                data_plots <- data()[seq(1, nrow(data()), 4),]
             } else if (input$what == "freqs") {
-                data_plots <- data()[seq(2, nrow(data()), 3),]
+                data_plots <- data()[seq(2, nrow(data()), 4),]
             }
             
-            pvalues <- data()[seq(3, nrow(data()), 3),]
+            pvalues <- data()[seq(3, nrow(data()), 4),]
             
             row.names(data_plots) <- substrLeft(row.names(data_plots),5)
             row.names(pvalues) <- substrLeft(row.names(pvalues),5)

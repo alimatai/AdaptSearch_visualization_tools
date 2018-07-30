@@ -1,0 +1,14 @@
+
+*** Heatmaps on the results of MutCount in concatenated mode ***
+
+    Species are ordered according to their position in the tree.
+    Codons are ordered according to their corresponding amino-acids,
+    and amino-acids are ordered according to their classification.
+
+Reading and formatting data ...
+
+Building heatmaps of amino-acids counts ...
+Building heatmaps of amino-acids frequencies ...
+
+Done
+

@@ -6,57 +6,57 @@ library(FactoMineR)
 
 ui <- navbarPage(theme=shinytheme('sandstone'), 'PCA analysis',
                  
-    tabPanel('Main',
-             sidebarLayout(
-                 sidebarPanel(
-                     fileInput("input_file", "choose a data file", multiple=FALSE, accept=NULL, width="300px"),
-                     actionButton("start", "Start"),
-                     div(style="display:inline-block; width:150px", selectInput(inputId="what", label="Choose what to plot", c("Countings" = "counts", "Frequencies"="freqs"))),
-                     numericInput(inputId="axisX", label="Axis X", value=1, min=1, max=NA, step=1, width="75px"),
-                     div(style="display:inline-block; width:75px", numericInput(inputId="axisY", label="Axis Y", value=2, min=1, max=NA, step=1)),
-                     selectInput(inputId="what_inds", label="Individuals color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
-                     selectInput(inputId="what_vars", label="Variables color range", c("Correlation"="cor", "cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
-                     numericInput(inputId="ind_colr", label="Axis for individuals color range", value=1, min=1, max=NA, step=1, width="210"),
-                     numericInput(inputId="var_colr", label="Axis for variables color range", value=1, min=1, max=NA, step=1, width="210")
-                ),
-                mainPanel(
-                    div(style="display:inline-block; width:150px", checkboxInput("show_labels", label="Show labels", value=TRUE)),
-                    div(style="display:inline-block; width:200px", checkboxInput("hide_data", label="Hide unrepresentative data", value=FALSE)),
-                    conditionalPanel(condition ="input.hide_data",
-                                     selectInput(inputId="hide_what", label="Reference", c("cos2" = "cos2", "Contribution" = "contrib")),
-                                     sliderInput("hide_range", "Hide values under (%of the max value)...", step=5, min=0, max=100, value=0)
-                                     ),
-                    h4('Individuals'),
-                    plotlyOutput('PCA_ind'),
-                    h4('Variables'),
-                    plotlyOutput('PCA_var'),
-                    h4('Biplot (on scaled coordinates)'),
-                    plotlyOutput('PCA_biplot'),
-                    h4('Explained variance per dimension'),
-                    plotlyOutput('PCA_eigen')
-                )
-             )
-    ),
-    
-    tabPanel('Individuals data',
-             mainPanel(
-                 h4('Cos2'),
-                 dataTableOutput('indcos2'),
-                 h4('Contribution'),
-                 dataTableOutput('indcontrib')
-             )
-    ),
-    
-    tabPanel('Variables data',
-             mainPanel(
-                 h4('Cos2'),
-                 dataTableOutput('varcos2'),
-                 h4('Contribution'),
-                 dataTableOutput('varcontrib'),
-                 h4('Correlation'),
-                 dataTableOutput('varcor')
-             )
-    )
+                 tabPanel('Main',
+                          sidebarLayout(
+                              sidebarPanel(
+                                  fileInput("input_file", "choose a data file", multiple=FALSE, accept=NULL, width="300px"),
+                                  actionButton("start", "Start"),
+                                  div(style="display:inline-block; width:150px", selectInput(inputId="what", label="Choose what to plot", c("Counts" = "counts", "Frequencies"="freqs"))),
+                                  numericInput(inputId="axisX", label="Axis X", value=1, min=1, max=NA, step=1, width="75px"),
+                                  div(style="display:inline-block; width:75px", numericInput(inputId="axisY", label="Axis Y", value=2, min=1, max=NA, step=1)),
+                                  selectInput(inputId="what_inds", label="Individuals color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
+                                  selectInput(inputId="what_vars", label="Variables color range", c("Correlation"="cor", "cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
+                                  numericInput(inputId="ind_colr", label="Axis for individuals color range", value=1, min=1, max=NA, step=1, width="210"),
+                                  numericInput(inputId="var_colr", label="Axis for variables color range", value=1, min=1, max=NA, step=1, width="210")
+                              ),
+                              mainPanel(
+                                  div(style="display:inline-block; width:150px", checkboxInput("show_labels", label="Show labels", value=TRUE)),
+                                  div(style="display:inline-block; width:200px", checkboxInput("hide_data", label="Hide unrepresentative data", value=FALSE)),
+                                  conditionalPanel(condition ="input.hide_data",
+                                                   selectInput(inputId="hide_what", label="Reference", c("cos2" = "cos2", "Contribution" = "contrib")),
+                                                   sliderInput("hide_range", "Hide values under (%of the max value)...", step=5, min=0, max=100, value=0)
+                                  ),
+                                  h4('Individuals'),
+                                  plotlyOutput('PCA_ind'),
+                                  h4('Variables'),
+                                  plotlyOutput('PCA_var'),
+                                  h4('Biplot (on scaled coordinates)'),
+                                  plotlyOutput('PCA_biplot'),
+                                  h4('Explained variance per dimension'),
+                                  plotlyOutput('PCA_eigen')
+                              )
+                          )
+                 ),
+                 
+                 tabPanel('Individuals data',
+                          mainPanel(
+                              h4('Cos2'),
+                              dataTableOutput('indcos2'),
+                              h4('Contribution'),
+                              dataTableOutput('indcontrib')
+                          )
+                 ),
+                 
+                 tabPanel('Variables data',
+                          mainPanel(
+                              h4('Cos2'),
+                              dataTableOutput('varcos2'),
+                              h4('Contribution'),
+                              dataTableOutput('varcontrib'),
+                              h4('Correlation'),
+                              dataTableOutput('varcor')
+                          )
+                 )
 )
 
 server <- function (input, output) {

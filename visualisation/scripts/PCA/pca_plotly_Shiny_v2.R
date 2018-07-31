@@ -2,7 +2,7 @@ library(shiny)
 library(shinythemes)
 library(plotly)
 library(FactoMineR)
-library(DT)
+#library(DT)
 
 ui <- navbarPage(theme=shinytheme('sandstone'), 'PCA analysis',
                  

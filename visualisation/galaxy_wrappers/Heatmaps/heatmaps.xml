@@ -35,7 +35,7 @@
         <param name="represent" type="select" label="What to plot" >
             <option value="frequencies">Frequencies</option>
             <option value="counts">Counts</option>
-            <option value="all">Both</option>
+            <option value="both">Both</option>
         </param>
     </inputs>
 
@@ -54,7 +54,7 @@
             <!-- Note : cannot test with png outputs ... I made a test with the additional log.txt file, which is kept just in case of a bug : more explicit error -->
             <param name="input" value="aa_freqs.csv"/>
             <param name="tree" value="tree.txt"/>
-            <param name="represent" value="all"/>
+            <param name="represent" value="both"/>
             <output name="log" value="log.txt"/>
             <!--
             <output name="heatmap_freqs" value="outputs/frequencies_of_amino-acids.png"/>

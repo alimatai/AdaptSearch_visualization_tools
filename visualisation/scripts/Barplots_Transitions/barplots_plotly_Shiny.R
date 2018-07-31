@@ -10,7 +10,7 @@ ui <- fluidPage(
     
     fileInput(inputId='data', 'choose a data file', multiple=FALSE, accept=NULL),
     div(style="display:inline-block", selectInput(inputId="what", label="Choose what to plot",
-                        c("Countings" = "counts", "Frequencies"="freqs"),
+                        c("Counts" = "counts", "Frequencies"="freqs"),
                         width="200px")),
     div(style="display:inline-block", numericInput(inputId="species", label="Species number ...", value=1, min=1, max=NA, step=1, width="200px")),
     div(style="display:inline-block", actionButton("start", "Start")),
@@ -113,7 +113,7 @@ server <- function (input, output) {
                              name='From Y to X',
                              showlegend = TRUE,
                              marker=list(color = 'rgb(102, 255, 102)')) %>%
-                    layout(title=paste("Transitions between", strsplit(rownames(data_plots)[input$species],">")[[1]][1], "to", strsplit(rownames(data_plots)[input$species],">")[[1]][2], sep=" "),
+                    layout(title=paste("Transitions from", strsplit(rownames(data_plots)[input$species],">")[[1]][1], "to", strsplit(rownames(data_plots)[input$species],">")[[1]][2], sep=" "),
                            yaxis = list(range=c(max_y,0), autorange=F, autorange = "reversed"),
                            xaxis = list(side='top'))
                 

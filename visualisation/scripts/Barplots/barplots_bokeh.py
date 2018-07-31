@@ -45,9 +45,9 @@ def make_barplot(species, xaxis, dic_yaxis, dic_yaxis_pvalues, what, x_range, wi
 
     # Transform pvalues in categorical data for color range
     for i in range(0,len(dic_yaxis_pvalues[species])):
-        if dic_yaxis_pvalues[species][i] < 0.05:
+        if dic_yaxis_pvalues[species][i] < 0.025:
             pvalues_factor[i] = 'lower'
-        elif dic_yaxis_pvalues[species][i] > 0.95:
+        elif dic_yaxis_pvalues[species][i] > 0.975:
             pvalues_factor[i] = 'higher'
         else :
             pvalues_factor[i] = 'unsignificant'

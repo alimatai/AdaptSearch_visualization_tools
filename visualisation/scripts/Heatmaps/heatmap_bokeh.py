@@ -100,7 +100,7 @@ def makeHeatmap(df, what, on_what, colors, range_x, range_y, width, height):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="Input csv file")
-    parser.add_argument("represent", choices=("counts", "frequencies", "all"), help="choose what to plot")
+    parser.add_argument("represent", choices=("counts", "frequencies", "both"), help="choose what to plot")
     parser.add_argument("tree", help="RAxML tree for lines order")
     args = parser.parse_args()
 
@@ -140,9 +140,9 @@ def main():
             if l[j] < 0.025:
                 l[j] = 5
             elif l[j] > 0.975:
-                l[j] = 10
-            else:
                 l[j] = 15
+            else:
+                l[j] = 10
 
     # correct names and stacking
     name_index = {elem:str.split(elem, "_")[0] for elem in y}
@@ -174,7 +174,7 @@ def main():
     elif args.represent == "frequencies":
         print "Building heatmaps of {} frequencies ...".format(on_what)
         makeHeatmap(df, args.represent, on_what, colors, x_range[on_what], y_range, width, height)
-    elif args.represent == "all":
+    elif args.represent == "both":
         print "Building heatmaps of {} counts ..."  .format(on_what)     
         makeHeatmap(df, "counts", on_what, colors, x_range[on_what], y_range, width, height)
         print "Building heatmaps of {} frequencies ...".format(on_what)

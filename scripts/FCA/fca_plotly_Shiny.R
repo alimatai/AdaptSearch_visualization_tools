@@ -13,19 +13,19 @@ ui <- navbarPage(theme=shinytheme('sandstone'), 'FCA analysis',
                                   actionButton("start", "Start"),
                                   div(style="display:inline-block; width:150px", selectInput(inputId="what", label="Choose what to plot", c("Counts" = "counts", "Frequencies"="freqs"))),
                                   numericInput(inputId="axisX", label="Axis X", value=1, min=1, max=NA, step=1, width="75px"),
-                                  div(style="display:inline-block; width:75px", numericInput(inputId="axisY", label="Axis Y", value=2, min=1, max=NA, step=1)),
-                                  selectInput(inputId="what_row", label="rows color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
-                                  selectInput(inputId="what_col", label="columns color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
-                                  numericInput(inputId="row_colr", label="Axis for rows color range", value=1, min=1, max=NA, step=1, width="210"),
-                                  numericInput(inputId="col_colr", label="Axis for columns color range", value=1, min=1, max=NA, step=1, width="210")
+                                  div(style="display:inline-block; width:75px", numericInput(inputId="axisY", label="Axis Y", value=2, min=1, max=NA, step=1))#,
+                                  #selectInput(inputId="what_row", label="rows color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
+                                  #selectInput(inputId="what_col", label="columns color range", c("cos2" = "cos2", "Contribution" = "contrib"), width="150px"),
+                                  #numericInput(inputId="row_colr", label="Axis for rows color range", value=1, min=1, max=NA, step=1, width="210"),
+                                  #numericInput(inputId="col_colr", label="Axis for columns color range", value=1, min=1, max=NA, step=1, width="210")
                               ),
                               mainPanel(
                                   div(style="display:inline-block; width:150px", checkboxInput("show_labels", label="Show labels", value=TRUE)),
-                                  div(style="display:inline-block; width:200px", checkboxInput("hide_data", label="Hide unrepresentative data", value=FALSE)),
-                                  conditionalPanel(condition ="input.hide_data",
-                                                   selectInput(inputId="hide_what", label="Reference", c("cos2" = "cos2", "Contribution" = "contrib")),
-                                                   sliderInput("hide_range", "Hide values under (%of the max value)...", step=5, min=0, max=100, value=0)
-                                  ),
+                                  #div(style="display:inline-block; width:200px", checkboxInput("hide_data", label="Hide unrepresentative data", value=FALSE)),
+                                  # conditionalPanel(condition ="input.hide_data",
+                                  #                  selectInput(inputId="hide_what", label="Reference", c("cos2" = "cos2", "Contribution" = "contrib")),
+                                  #                  sliderInput("hide_range", "Hide values under (%of the max value)...", step=5, min=0, max=100, value=0)
+                                  # ),
                                   h4('CA factor map'),
                                   plotlyOutput('CA_factor_map'),
                                   h4('Explained variance per dimension'),
@@ -87,13 +87,13 @@ server <- function (input, output) {
             output$CA_factor_map <- renderPlotly({
                 
                 row_coord <- scale(as.data.frame(data()$row$coord), center=TRUE, scale=TRUE)
-                if (input$what_row == "cos2") {colors <- as.data.frame(data()$row$cos2)}
-                else if (input$what_row == "contrib") {colors <- as.data.frame(data()$row$contrib)}
+                #if (input$what_row == "cos2") {colors <- as.data.frame(data()$row$cos2)}
+                #else if (input$what_row == "contrib") {colors <- as.data.frame(data()$row$contrib)}
                 
                 col_coord <- scale(as.data.frame(data()$col$coord), center=TRUE, scale=TRUE)
                 
-                if (input$what_col == "cos2") {colors2 <- as.data.frame(data()$col$cos2)}
-                else if (input$what_col == "contrib") {colors2 <- as.data.frame(data()$col$contrib)}
+                #if (input$what_col == "cos2") {colors2 <- as.data.frame(data()$col$cos2)}
+                #else if (input$what_col == "contrib") {colors2 <- as.data.frame(data()$col$contrib)}
                 
                 if (input$show_labels) {mod="markers+text"}
                 else {mod="markers"}
